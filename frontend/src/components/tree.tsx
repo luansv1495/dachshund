@@ -110,6 +110,7 @@ function Tree({
             <ChevronRightIcon className="transition-transform group-data-[state=open]/collapsible:rotate-90" />
             {getIconByType(node.type)}
             {node.name}
+            <p className="text-muted-foreground">{node.metadata}</p>
           </SidebarMenuButton>
         </CollapsibleTrigger>
 

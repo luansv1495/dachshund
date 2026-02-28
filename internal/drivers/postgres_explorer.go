@@ -119,11 +119,14 @@ func (e *PostgresExplorer) listTables(ctx context.Context, path *core.NodePath) 
 	}
 
 	rows, err := e.driver.Query(ctx, `
-		SELECT table_name
-		FROM information_schema.tables
-		WHERE table_schema = $1
-		  AND table_type = 'BASE TABLE'
-		ORDER BY table_name
+		SELECT
+			c.relname,
+			pg_size_pretty(pg_total_relation_size(c.oid)) AS total_size
+		FROM pg_class c
+		JOIN pg_namespace n ON n.oid = c.relnamespace
+		WHERE n.nspname = $1
+		AND c.relkind = 'r'
+		ORDER BY c.relname
 	`, path.Schema)
 	if err != nil {
 		return nil, err
@@ -134,7 +137,8 @@ func (e *PostgresExplorer) listTables(ctx context.Context, path *core.NodePath) 
 
 	for rows.Next() {
 		var name string
-		if err := rows.Scan(&name); err != nil {
+		var size string
+		if err := rows.Scan(&name, &size); err != nil {
 			return nil, err
 		}
 
@@ -142,6 +146,7 @@ func (e *PostgresExplorer) listTables(ctx context.Context, path *core.NodePath) 
 		nodes = append(nodes, core.TreeNode{
 			ID:          id,
 			Name:        name,
+			Metadata:    size,
 			Type:        "table",
 			HasChildren: true,
 		})

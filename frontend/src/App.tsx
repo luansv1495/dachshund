@@ -5,6 +5,7 @@ import { core } from "../wailsjs/go/models";
 
 import "./App.css";
 import { useQuery } from "@tanstack/react-query";
+import { TabBar } from "./components/tab-bar";
 
 function App() {
   const { data: connections } = useQuery({
@@ -20,8 +21,8 @@ function App() {
     <SidebarProvider
       style={
         {
-          "--sidebar-width": "20rem",
-          "--sidebar-width-mobile": "20rem",
+          "--sidebar-width": "25rem",
+          "--sidebar-width-mobile": "25rem",
         } as React.CSSProperties
       }
     >
@@ -30,7 +31,7 @@ function App() {
         connectionTypes={connectionTypes ?? []}
       />
       <SidebarInset>
-        <header className="bg-background sticky top-0 flex h-10 shrink-0 items-center gap-2 border-b px-4"></header>
+        <TabBar />
         <div className="flex flex-1 flex-col gap-4 p-4">
           {Array.from({ length: 24 }).map((_, index) => (
             <div
